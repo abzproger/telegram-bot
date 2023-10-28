@@ -1,5 +1,5 @@
 import sqlite3
-
+from datetime import datetime
 
 class DataBase:
     def __init__(self, db_name):
@@ -54,7 +54,8 @@ class User:
     def add_user(self, username, telegram_id, phone_number, email):
         # if  self.user_exists(telegram_id):
         # raise ValueError("Пользователь с таким telegram_id уже существует")
-        data = (None, username, telegram_id, phone_number, email)  # None для автоинкрементного столбца id
+        reg_data = datetime.now().date()
+        data = (None, username, telegram_id, phone_number, email,reg_data)  # None для автоинкрементного столбца id
         self.db.insert_data("user", data)
 
     def get_users(self):
@@ -124,7 +125,7 @@ db.create_table("user",  # Создаем таблицы, если их не с�
                  "username TEXT NOT NULL",
                  "telegram_id INTEGER NOT NULL",
                  "phone INTEGER ",
-                 "email TEXT NOT NULL"])
+                 "email TEXT NOT NULL","reg_date TEXT NOT NULL"])
 db.create_table("product",
                 ["id INTEGER PRIMARY KEY AUTOINCREMENT",
                  "product TEXT NOT NULL",
