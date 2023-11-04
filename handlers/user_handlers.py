@@ -4,9 +4,6 @@ from aiogram.filters import Command, CommandStart,Filter
 from aiogram.types import Message
 from lexicon.lexicon_ru import LEXICON, FSM_LEXICON, pagination
 from database.database import Products, db, user, Cart
-from aiogram.filters.state import State, StatesGroup, StateFilter
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import default_state
 from keyboard.keyboard import kb_generator, ikb_generator
 from aiogram.types import CallbackQuery
 from aiogram.exceptions import TelegramBadRequest
@@ -16,6 +13,8 @@ router: Router = Router()
 
 product = Products(db)
 cart = Cart(db)
+
+categories = list(set([x[0] for x in product.get_categories()]))
 
 
 @dataclass
@@ -33,17 +32,33 @@ class Cats_Filter(Filter):
         return message.text in self.my_cats
 
 
-categories = list(set([x[0] for x in product.get_categories()]))
+
+@router.message(CommandStart())
+async def start(message: Message):
+    if not user.user_exists(message.from_user.id):
+        await message.answer(LEXICON['new_user'],
+                             reply_markup=kb_generator([LEXICON['registration'], LEXICON['cancel']]))
+    else:
+        await message.answer(text=f"{LEXICON['old_user']}",
+                             reply_markup=kb_generator([LEXICON['start_buy'], LEXICON['cart'], LEXICON['cancel']]),
+                             one_time_keyboard=True)
 
 @router.message(Command('location'))
 async def get_location(message: Message):
     await message.answer(LEXICON['location'])
     await message.answer_location(latitude=42.736093725784436, longitude=47.13569643312872)
 
+
+
+
+
+
 @router.message(F.text == (LEXICON['start_buy']))
 async def start_buy(message:Message):
-    await message.answer(text=LEXICON['select_cats'],reply_markup=kb_generator(categories))
-    print(message.from_user.id)
+    if categories:
+        await message.answer(text=LEXICON['select_cats'],reply_markup=kb_generator(categories))
+    else:
+        await message.answer(text=LEXICON['empty'])
 
 #Тут исправить
 @router.message(Cats_Filter(categories=categories))

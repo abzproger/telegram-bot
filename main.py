@@ -21,7 +21,6 @@ async def main():
     # Инициализируем бот и диспетчер
     bot: Bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
     dp: Dispatcher = Dispatcher(storage=storage)
-    dp.include_router(service.router)
     dp.include_router(user_handlers.router)
     dp.include_router(admin_handlers.router)
     dp.include_router(other_handlers.router)

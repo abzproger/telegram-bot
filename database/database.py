@@ -43,8 +43,10 @@ class DataBase:
 
 
 class User:
+    date = datetime.now().date()
     def __init__(self, db):
         self.db = db
+
 
     def user_exists(self, telegram_id):
         condition = f"telegram_id = {telegram_id}"
@@ -54,9 +56,12 @@ class User:
     def add_user(self, username, telegram_id, phone_number, email):
         # if  self.user_exists(telegram_id):
         # raise ValueError("Пользователь с таким telegram_id уже существует")
-        reg_data = datetime.now().date()
-        data = (None, username, telegram_id, phone_number, email,reg_data)  # None для автоинкрементного столбца id
+
+        data = (None, username, telegram_id, phone_number, email,self.date)  # None для автоинкрементного столбца id
         self.db.insert_data("user", data)
+
+    def update_user(self,data,condition):
+        db.update_data(table_name='user',data=data,condition=condition)
 
     def get_users(self):
         rows = self.db.select_data("user")
